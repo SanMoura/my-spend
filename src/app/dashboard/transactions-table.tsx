@@ -18,7 +18,7 @@ import {
 import { Transaction } from './transaction';
 import { getTransactions, ISelectTransaction, IParams } from '@/lib/db';
 import { useRouter } from 'next/navigation';
-import { CalendarCheck2, CalendarClock, CalendarX2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowUpNarrowWide, CalendarCheck2, CalendarClock, CalendarX2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function TransactionsTable({
@@ -95,9 +95,11 @@ export function TransactionsTable({
         <CardTitle className='mb-2'>Todas as transações</CardTitle>
         <CardDescription className='flex items-center'>
           {/* Manage your products and view their sales performance. */}
-          <CalendarCheck2 className='mr-2 text-green-700'/> Pagas
-          <CalendarClock className='mr-2 ml-2 text-orange-500'/> Pendentes
-          <CalendarX2 className='mr-2 ml-2 text-red-500'/> Atrasadas
+          <CalendarCheck2 className='mr-2 ml-2 text-green-700'/> Pagas |
+          <CalendarClock className='mr-2 ml-2 text-orange-500'/> Pendentes |
+          <CalendarX2 className='mr-2 ml-2 text-red-500'/> Atrasadas |
+          <ArrowDownNarrowWide className='mr-2 ml-2 text-red-800'/> Despesa |
+          <ArrowUpNarrowWide className='mr-2 ml-2 text-green-800'/> Ganho |
         </CardDescription>
       </CardHeader>
 
@@ -106,19 +108,17 @@ export function TransactionsTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="hidden w-[20px] sm:table-cell">
-                {/* <span className="sr-only">Image</span> */}
+              <TableHead className='font-bold text-right w-[20px]'>
+                {/* ações */}
+                {/* <span className="sr-only">Actions</span> */}
               </TableHead>
-              {/* <TableHead className="hidden text-center sm:table-cell">Status</TableHead> */}
-              <TableHead>Descrição</TableHead>
-              <TableHead className="hidden w-[50px] sm:table-cell">Valor</TableHead>
-              <TableHead className="hidden w-[30px] sm:table-cell text-center">
+              <TableHead className='text-xl font-bold'>Descrição</TableHead>
+              <TableHead className="text-xl font-bold text-left sm:table-cell">Valor</TableHead>
+              <TableHead className="text-xl font-bold w-[30px] sm:table-cell text-center">
                 Parcelas
               </TableHead>
-              <TableHead className="hidden md:table-cell">Vencimento</TableHead>
-              <TableHead className='text-right'>
-                <span className="sr-only">Actions</span>
-              </TableHead>
+              <TableHead className="text-xl font-bold text-center md:table-cell">Vencimento</TableHead>
+              <TableHead className="text-xl font-bold w-[20px] sm:table-cell"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -128,7 +128,7 @@ export function TransactionsTable({
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter>
+      <CardFooter className='hidden'>
         <form className="flex items-center w-full justify-between">
           <div className="text-xs text-muted-foreground">
             Mostrando{' '}
