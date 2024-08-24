@@ -70,11 +70,11 @@ function DesktopNav() {
           <span className="sr-only">Acme Inc</span>
         </Link>
 
-        <NavItem href="#" label="Dashboard">
+        <NavItem href="/dashboard" label="Dashboard">
           <Home className="h-5 w-5" />
         </NavItem>
 
-        <NavItem href="#" label="Orders">
+        {/* <NavItem href="#" label="Orders">
           <ShoppingCart className="h-5 w-5" />
         </NavItem>
 
@@ -84,7 +84,7 @@ function DesktopNav() {
 
         <NavItem href="/customers" label="Customers">
           <Users2 className="h-5 w-5" />
-        </NavItem>
+        </NavItem> */}
 
         <NavItem href="#" label="Analytics">
           <LineChart className="h-5 w-5" />
@@ -179,13 +179,13 @@ function DashboardBreadcrumb() {
         <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="#">Products</Link>
+            <Link href="#">Gastos</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbSeparator />
+        {/* <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbPage>All Products</BreadcrumbPage>
-        </BreadcrumbItem>
+        </BreadcrumbItem> */}
       </BreadcrumbList>
     </Breadcrumb>
   );
