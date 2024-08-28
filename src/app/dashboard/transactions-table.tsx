@@ -18,22 +18,30 @@ import {
 import { Transaction } from './transaction';
 import { getTransactions, ISelectTransaction, IParams } from '@/lib/db';
 import { useRouter } from 'next/navigation';
-import { ArrowDownNarrowWide, ArrowUpNarrowWide, CalendarCheck2, CalendarClock, CalendarX2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowUpNarrowWide, CalendarCheck2, CalendarClock, CalendarX2, ChevronLeft, ChevronRight, CircleCheckBig, Coins, DollarSign, PiggyBank } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// import show from '@/app/api/transactions'
+import { Prisma  } from '@prisma/client';
+type TransactionsWithInstallments = Prisma.transactionsGetPayload<{
+  include: { installment: true };
+}>;
 export function TransactionsTable({
   params
-}: {params: IParams}) {
-  const [data, setData] = useState<ISelectTransaction>();
+}: { params: IParams }) {
+  const [data, setData] = useState<TransactionsWithInstallments[]>();
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await getTransactions({ 
-          year: params.year, 
-          month: params.month 
-        });
-        setData(result);
+        // const result = await getTransactions({
+        //   year: params.year,
+        //   month: params.month
+        // });
+        fetch('/api/transactions')
+        .then((response) => response.json())
+        .then((data) => setData(data));
+
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
       } finally {
@@ -43,7 +51,6 @@ export function TransactionsTable({
 
     fetchData();
   }, []);
-  
   let router = useRouter();
   let transactionsPerPage = 5;
 
@@ -52,7 +59,7 @@ export function TransactionsTable({
   }
 
   function nextPage() {
-    router.push(`/?newOffset=${data?.newOffset ?? 0}`, { scroll: false });
+    router.push(`/?newOffset=${0}`, { scroll: false });
   }
 
   if (loading) {
@@ -92,14 +99,67 @@ export function TransactionsTable({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className='mb-2'>Todas as transações</CardTitle>
+        {/* <CardTitle className='mb-8 flex'>
+            <PiggyBank className='text-teal-300'/>
+            <span className='ml-2'>
+              <div className='font-bold text-sm'>Saldo Atual</div>
+              <div>R$ 200,00</div>
+            </span>
+          </CardTitle> */}
+        <div className="flex items-center mb-2">
+          <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <CircleCheckBig className='text-teal-300' />
+            <span className='ml-2'>
+              <div className='font-bold text-base'>Recebidos</div>
+              <div>R$ 2000,00</div>
+            </span>
+          </CardTitle>
+
+          <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <CircleCheckBig className='text-red-300' />
+            <span className='ml-2'>
+              <div className='font-bold text-base'>Pagas</div>
+              <div>R$ 200,00</div>
+            </span>
+          </CardTitle>
+          <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <Coins className='text-cyan-600' />
+            <span className='ml-2'>
+              <div className='font-bold text-base'>Falta pagar</div>
+              <div>R$ 0,00</div>
+            </span>
+          </CardTitle>
+
+          <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <DollarSign className='text-green-700' />
+            <span className='ml-2'>
+              <div className='font-bold text-base'>Receitas</div>
+              <div>R$ 200,00</div>
+            </span>
+          </CardTitle>
+          <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <DollarSign className='text-red-700' />
+            <span className='ml-2'>
+              <div className='font-bold text-base'>Despesas</div>
+              <div>R$ 200,00</div>
+            </span>
+          </CardTitle>
+          <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <DollarSign className='text-cyan-600' />
+            <span className='ml-2'>
+              <div className='font-bold text-base'>Saldo</div>
+              <div>R$ 0,00</div>
+            </span>
+          </CardTitle>
+        </div>
+        {/* <CardTitle className='mb-2'>Todas as transações</CardTitle> */}
         <CardDescription className='flex items-center'>
           {/* Manage your products and view their sales performance. */}
-          <CalendarCheck2 className='mr-2 ml-2 text-green-700'/> Pagas |
-          <CalendarClock className='mr-2 ml-2 text-orange-500'/> Pendentes |
-          <CalendarX2 className='mr-2 ml-2 text-red-500'/> Atrasadas |
-          <ArrowDownNarrowWide className='mr-2 ml-2 text-red-800'/> Despesa |
-          <ArrowUpNarrowWide className='mr-2 ml-2 text-green-800'/> Ganho |
+          <CalendarCheck2 className='mr-1 ml-2 text-green-700' /> Pagas
+          <CalendarClock className='mr-1 ml-2 text-orange-500' /> Pendentes
+          <CalendarX2 className='mr-1 ml-2 text-red-500' /> Atrasadas
+          <ArrowDownNarrowWide className='mr-1 ml-2 text-red-800' /> Despesa
+          <ArrowUpNarrowWide className='mr-1 ml-2 text-green-800' /> Ganho
         </CardDescription>
       </CardHeader>
 
@@ -122,7 +182,7 @@ export function TransactionsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.transactions.map((transaction) => (
+            {data.map((transaction) => (
               <Transaction key={transaction.id} transaction={transaction} />
             ))}
           </TableBody>
@@ -133,9 +193,9 @@ export function TransactionsTable({
           <div className="text-xs text-muted-foreground">
             Mostrando{' '}
             <strong>
-              {Math.min(data.newOffset - transactionsPerPage, data.totalTransactions) + 1}-{data.newOffset}
+              0
             </strong>{' '}
-            de <strong>{data.totalTransactions}</strong> gastos
+            de 0 gastos
           </div>
           <div className="flex">
             <Button
@@ -143,7 +203,7 @@ export function TransactionsTable({
               variant="ghost"
               size="sm"
               type="submit"
-              disabled={data.newOffset === transactionsPerPage}
+              disabled={0 === transactionsPerPage}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Prev
@@ -153,7 +213,7 @@ export function TransactionsTable({
               variant="ghost"
               size="sm"
               type="submit"
-              disabled={data.newOffset + transactionsPerPage > data.totalTransactions}
+              disabled={0 + transactionsPerPage > 1}
             >
               Next
               <ChevronRight className="ml-2 h-4 w-4" />

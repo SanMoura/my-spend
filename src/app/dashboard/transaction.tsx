@@ -15,16 +15,20 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { ITransaction } from '@/lib/db';
 import { deleteTransaction, updateTransaction } from './actions';
 import { Modal } from '@/components/modal/modal';
-export function Transaction({ transaction }: { transaction: ITransaction }) {
+import { Prisma } from '@prisma/client';
+type TransactionsWithInstallments = Prisma.transactionsGetPayload<{
+  include: { installment: true };
+}>;
+export function Transaction({ transaction }: { transaction: TransactionsWithInstallments }) {
   let statusIcon: any;
   switch (transaction.status) {
-    case 'paid': statusIcon = <CalendarCheck2 className='text-center text-green-700' />;
+    case 'PAID': statusIcon = <CalendarCheck2 className='text-center text-green-700' />;
       break;
 
-    case 'pending': statusIcon = <CalendarClock className='text-center text-orange-500' />;
+    case 'PENDING': statusIcon = <CalendarClock className='text-center text-orange-500' />;
       break;
 
-    case 'late': statusIcon = <CalendarX2 className='text-center text-red-500' />;
+    case 'LATE': statusIcon = <CalendarX2 className='text-center text-red-500' />;
       break;
 
     default: statusIcon = <Calendar />;
@@ -38,7 +42,7 @@ export function Transaction({ transaction }: { transaction: ITransaction }) {
   const closeModal = () => {
     setModalOpen(false);
   };
-
+  const dueDate = new Date(transaction.due_date);
   return (
     <>
     <Modal isOpen={isModalOpen} onClose={closeModal} transaction_id={transaction.id}/>
@@ -67,14 +71,12 @@ export function Transaction({ transaction }: { transaction: ITransaction }) {
       <TableCell className="hidden text-left md:table-cell">
         <div className='flex'>
           <ArrowDownNarrowWide className='h-5 w-5 mr-2 text-red-500' />
-          {transaction.name}
+          {transaction.describe}
         </div>
       </TableCell>
-      <TableCell className="hidden text-left md:table-cell">{`$${transaction.price}`}</TableCell>
-      <TableCell className="hidden text-center md:table-cell">{transaction.installments}</TableCell>
-      <TableCell className="hidden md:table-cell text-center">
-        {transaction.availableAt.toLocaleDateString()}
-      </TableCell>
+      <TableCell className="hidden text-left md:table-cell">{`$${transaction.value}`}</TableCell>
+      <TableCell className="hidden text-center md:table-cell">{transaction.installment_number}/{transaction.installment?.total}</TableCell>
+      <TableCell className="hidden md:table-cell text-center">{dueDate.toISOString()}</TableCell>
       <TableCell className='md:table-cell'>{statusIcon}</TableCell>
     </TableRow>
     </>
