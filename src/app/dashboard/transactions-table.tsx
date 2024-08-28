@@ -145,6 +145,13 @@ export function TransactionsTable({
             </span>
           </CardTitle>
           <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <PiggyBank className='text-fuchsia-400' />
+            <span className='ml-2'>
+              <div className='font-bold text-base'>Economia</div>
+              <div>R$ 0,00</div>
+            </span>
+          </CardTitle>
+          <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
             <DollarSign className='text-cyan-600' />
             <span className='ml-2'>
               <div className='font-bold text-base'>Saldo</div>
