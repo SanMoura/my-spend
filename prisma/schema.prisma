@@ -14,21 +14,21 @@ datasource db {
 }
 
 model transactions {
-  id                 String              @id @default(auto()) @map("_id") @db.ObjectId
-  type               typeTransactionEnum
-  due_date           DateTime
-  status             statusEnum
-  describe           String
-  value              Float
-  competence_date    DateTime
-  active             Boolean             @default(true)
-  created_at         DateTime            @default(now())
-  updated_at         DateTime            @updatedAt
-  credit_card        credit_card?        @relation(fields: [credit_card_id], references: [id])
-  credit_card_id     String?             @db.ObjectId
-  installment        installment?        @relation(fields: [installment_id], references: [id])
-  installment_id     String?             @db.ObjectId
-  installment_number Int?
+  id                  String              @id @default(auto()) @map("_id") @db.ObjectId
+  type                typeTransactionEnum
+  due_date            DateTime
+  status              statusEnum
+  describe            String
+  value               Float
+  competence_date     DateTime
+  active              Boolean             @default(true)
+  created_at          DateTime            @default(now())
+  updated_at          DateTime            @updatedAt
+  credit_card         credit_card?        @relation(fields: [credit_card_id], references: [id])
+  credit_card_id      String?             @db.ObjectId
+  installment         installment?        @relation(fields: [installment_id], references: [id])
+  installment_id      String?             @db.ObjectId
+  current_installment Int?
 }
 
 model installment {

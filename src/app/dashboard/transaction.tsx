@@ -10,11 +10,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { ArrowDownNarrowWide, Calendar, CalendarCheck2, CalendarClock, CalendarX2, Pen } from 'lucide-react';
+import { ArrowDownNarrowWide, Calendar, CalendarCheck2, CalendarClock, CalendarX2, Pen, PlusCircle } from 'lucide-react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { ITransaction } from '@/lib/db';
 import { deleteTransaction, updateTransaction } from './actions';
-import { Modal } from '@/components/modal/modal';
+import { Modal, IConfigsModal } from '@/components/modal/modal';
 import { Prisma } from '@prisma/client';
 type TransactionsWithInstallments = Prisma.transactionsGetPayload<{
   include: { installment: true };
@@ -35,7 +35,9 @@ export function Transaction({ transaction }: { transaction: TransactionsWithInst
       break;
   }
   const [isModalOpen, setModalOpen] = useState(false);
-  const openModal = () => {
+  const [configModal, setConfigModal] = useState<IConfigsModal>();
+  const openModal = (params: IConfigsModal) => {
+    setConfigModal(params);
     setModalOpen(true);
   };
 
@@ -45,7 +47,7 @@ export function Transaction({ transaction }: { transaction: TransactionsWithInst
   const dueDate = new Date(transaction.due_date);
   return (
     <>
-    <Modal isOpen={isModalOpen} onClose={closeModal} transaction_id={transaction.id}/>
+    <Modal isOpen={isModalOpen} onClose={closeModal} configs={configModal ?? null}/>
     <TableRow>
       <TableCell className='text-left'>
         <DropdownMenu>
@@ -57,7 +59,7 @@ export function Transaction({ transaction }: { transaction: TransactionsWithInst
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className='border-gray-300'>
             <DropdownMenuLabel>Ações</DropdownMenuLabel>
-            <DropdownMenuItem onClick={openModal}>
+            <DropdownMenuItem onClick={() => openModal({transaction_id: transaction.id, type: 'transaction-update'})}>
               Editar
             </DropdownMenuItem>
             <DropdownMenuItem>
