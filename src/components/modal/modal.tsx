@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input, InputSelectCreditCard, InputSelect } from '@/components/ui/inputForm';
 import { updateTransaction } from '@/app/dashboard/actions';
 import { ICreateFormTransaction } from '@/interfaces/ITransactions'
+import dayjs from "dayjs";
 export type IConfigsModal = {
   transaction_id?: string;
   type: 'transaction-update' | 'transaction-delete' | 'transaction-create' | 'credit-card-show'
@@ -64,7 +65,7 @@ export function Modal(data: { isOpen: boolean, onClose: () => void, configs: ICo
       formattedFormValues.installments = +formattedFormValues.installments
       formattedFormValues.installment_value = +formattedFormValues.installment_value
       formattedFormValues.current_installment = +formattedFormValues.current_installment
-      formattedFormValues.due_date = new Date()
+      formattedFormValues.due_date = new Date(formattedFormValues.due_date || '2022-01-01')
 
       if (
         (formattedFormValues.current_installment > 0 ||
@@ -155,9 +156,9 @@ export function Modal(data: { isOpen: boolean, onClose: () => void, configs: ICo
     <Card className={styles.background_modal}>
       <CardHeader>
         <CardTitle className='mb-2'>Nova transação</CardTitle>
-        {/* <CardDescription className='flex items-center'>
-          Código da transação: {data.configs.transaction_id ?? 'Não informado'}
-        </CardDescription> */}
+        <CardDescription className='flex items-center'>
+          Competência: {dayjs(data.configs.competence_date).format('MM/YYYY')}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={updateTransaction} className="relative ml-auto flex-1 md:grow-0">
@@ -169,6 +170,7 @@ export function Modal(data: { isOpen: boolean, onClose: () => void, configs: ICo
                   { value: 'none', describe: 'Selecione...' },
                   { value: 'EXPENSE', describe: 'Despesa' },
                   { value: 'INCOME', describe: 'Receita' },
+                  { value: 'ECONOMY', describe: 'Economia' },
                 ]}
                 description="Tipo"
                 onChange={handleChange} 

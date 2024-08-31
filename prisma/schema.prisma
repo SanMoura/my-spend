@@ -44,6 +44,7 @@ model installment {
 enum typeTransactionEnum {
   EXPENSE
   INCOME
+  ECONOMY
 }
 
 enum statusEnum {
@@ -57,6 +58,7 @@ model credit_card {
   describe     String
   active       Boolean        @default(true)
   transactions transactions[]
+  color        String         @default("white")
   limit        Float
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt

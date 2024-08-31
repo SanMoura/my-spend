@@ -42,11 +42,14 @@ export default async function ProductsPage({
           ))}
         </TabsList>
       </div>
-      <TabsContent value="1">
-        <TransactionsTable
-          params={{ year: '2024', month: '1' }}
-        />
-      </TabsContent>
+      {tabList.map((tab) => (
+        <TabsContent key={tab.value} value={tab.value}>
+          <TransactionsTable
+            params={{ year: '2024', month: tab.value }}
+          />
+        </TabsContent>  
+      ))}
+      
     </Tabs>
   );
 }
