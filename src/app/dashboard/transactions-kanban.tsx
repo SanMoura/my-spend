@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
+import KanbanCard from '@/components/kanban/card'
 import { Transaction } from './transaction';
 import { getTransactions, ISelectTransaction, IParams } from '@/lib/db';
 import { useRouter } from 'next/navigation';
@@ -25,13 +26,15 @@ import { findMany } from '@/app/api/transactions/transactions.repository'
 // import show from '@/app/api/transactions'
 import { Prisma  } from '@prisma/client';
 import { IConfigsModal, Modal } from '@/components/modal/modal';
+import { set } from 'zod';
 type TransactionsWithIncluds = Prisma.transactionsGetPayload<{
   include: { installment: true, credit_card: true };
 }>;
-export function TransactionsTable({
+export function TransactionsKanban({
   params
 }: { params: IParams }) {
   const [data, setData] = useState<TransactionsWithIncluds[]>();
+  const [totalCreditCards, setTotalCreditCards] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setModalOpen] = useState(false);
   const [configModal, setConfigModal] = useState<IConfigsModal>({
@@ -41,13 +44,15 @@ export function TransactionsTable({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // fetch('/api/transactions?year=' + params.year + '&month=' + params.month)
-        // .then((response) => response.json())
-        // .then((data) => setData(data));
-        const ret: any = await findMany( { year: params.year, month: params.month } )
         
+        const ret: any = await findMany({ 
+          year: params.year, 
+          month: params.month,
+        });
+
         if (!ret) throw new Error("Failed to fetch transactions");
-        setData(ret);
+        setData(ret.transactions);
+        setTotalCreditCards(ret.totalCreditCards);
 
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
@@ -143,10 +148,9 @@ export function TransactionsTable({
     if (item.type === 'ECONOMY') {
       dashboardData.economies = dashboardData.economies + item.value;
     }
+  
     dashboardData.balance = dashboardData.incomes - dashboardData.expenses - dashboardData.economies;
   })
-
- 
 
   return (
     <>
@@ -160,8 +164,8 @@ export function TransactionsTable({
                 <div>R$ 200,00</div>
               </span>
             </CardTitle> */}
-          <div className="flex items-center mb-2">
-            <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+          <div className="flex items-center">
+            <CardTitle className=' mr-2 flex p-4 border-2'>
               <CircleCheckBig className='text-teal-300' />
               <span className='ml-2'>
                 <div className='font-bold text-base'>Recebidos</div>
@@ -169,14 +173,14 @@ export function TransactionsTable({
               </span>
             </CardTitle>
 
-            <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <CardTitle className=' mr-2 flex p-4 border-2'>
               <CircleCheckBig className='text-red-300' />
               <span className='ml-2'>
                 <div className='font-bold text-base'>Pagas</div>
                 <div>{moneyFormat(dashboardData.paid.expense)}</div>
               </span>
             </CardTitle>
-            <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <CardTitle className=' mr-2 flex p-4 border-2'>
               <Coins className='text-cyan-600' />
               <span className='ml-2'>
                 <div className='font-bold text-base'>Falta pagar</div>
@@ -184,28 +188,28 @@ export function TransactionsTable({
               </span>
             </CardTitle>
 
-            <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <CardTitle className=' mr-2 flex p-4 border-2'>
               <ArrowUp className='text-green-700' />
               <span className='ml-2'>
                 <div className='font-bold text-base'>Receitas</div>
                 <div>{moneyFormat(dashboardData.incomes)}</div>
               </span>
             </CardTitle>
-            <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <CardTitle className=' mr-2 flex p-4 border-2'>
               <ArrowDown className='text-red-700' />
               <span className='ml-2'>
                 <div className='font-bold text-base'>Despesas</div>
                 <div>{moneyFormat(dashboardData.expenses)}</div>
               </span>
             </CardTitle>
-            <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <CardTitle className=' mr-2 flex p-4 border-2'>
               <PiggyBank className='text-fuchsia-400' />
               <span className='ml-2'>
                 <div className='font-bold text-base'>Economia</div>
                 <div>{moneyFormat(dashboardData.economies)}</div>
               </span>
             </CardTitle>
-            <CardTitle className='mb-2 mr-2 flex p-4 border-2'>
+            <CardTitle className=' mr-2 flex p-4 border-2'>
               <DollarSign className='text-cyan-600' />
               <span className='ml-2'>
                 <div className='font-bold text-base'>Saldo</div>
@@ -225,41 +229,47 @@ export function TransactionsTable({
           </div>
           </div>
           {/* <CardTitle className='mb-2'>Todas as transações</CardTitle> */}
-          <CardDescription className='flex items-center'>
-            {/* Manage your products and view their sales performance. */}
+
+          {/* <CardDescription className='flex items-center'>
             <CalendarCheck2 className='mr-1 ml-2 text-green-700' /> Pagas
             <CalendarClock className='mr-1 ml-2 text-orange-500' /> Pendentes
             <CalendarX2 className='mr-1 ml-2 text-red-500' /> Atrasadas
-            {/* <ArrowDownNarrowWide className='mr-1 ml-2 text-red-800' /> Despesa
-            <ArrowUpNarrowWide className='mr-1 ml-2 text-green-800' /> Ganho */}
-          </CardDescription>
+          </CardDescription> */}
+
         </CardHeader>
 
-        <CardContent className='max-h-[980px] overflow-y-auto'>
-          <Table className='w-full border-collapse'>
-            <TableHeader className='position-sticky top-0 z-10'>
-              <TableRow>
-                <TableHead className='font-bold text-right w-[20px]'>
-                  {/* ações */}
-                  {/* <span className="sr-only">Actions</span> */}
-                </TableHead>
-                <TableHead className='text-xl font-bold'>Descrição</TableHead>
-                <TableHead className="text-xl font-bold text-left sm:table-cell">Valor</TableHead>
-                <TableHead className="text-xl font-bold w-[30px] sm:table-cell text-center">
-                  Parcelas
-                </TableHead>
-                <TableHead className="text-xl font-bold text-center md:table-cell">Vencimento</TableHead>
-                {/* <TableHead className="text-xl font-bold w-[20px] sm:table-cell"></TableHead> */}
-              </TableRow>
-            </TableHeader>
-            <TableBody >
-              {data.map((transaction) => (
-                <Transaction key={transaction.id} transaction={transaction} />
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-        <CardFooter className='hidden'>
+        <CardContent className="max-h-[80vh] overflow-y-auto">
+        <div className="flex flex-row gap-4">
+          <div className="flex flex-col flex-col-4  border rounded-lg shadow-md min-w-[80%]">
+            <div className="p-2 font-bold text-center">
+              PENDENTES
+            </div>
+            <div className="grid grid-cols-4 p-2 overflow-y-auto max-h-[57vh] bg-neutral-400">
+              {data
+                .filter((transaction) => transaction.status === 'PENDING')
+                .map((transaction) => (
+                  transaction.credit_card_id === null &&
+                  <KanbanCard key={transaction.id} transaction={transaction} />
+                ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col border rounded-lg shadow-md min-w-[20%]">
+            <div className="p-2 font-bold text-center">
+              PAGOS
+            </div>
+            <div className="grid grid-cols-1 p-2 space-y-2 overflow-y-auto max-h-[57vh] bg-neutral-400">
+              {data
+                .filter((transaction) => transaction.status === 'PAID')
+                .map((transaction) => (
+                  <KanbanCard key={transaction.id} transaction={transaction} />
+                ))}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+
+        {/* <CardFooter className='hidden'>
           <form className="flex items-center w-full justify-between">
             <div className="text-xs text-muted-foreground">
               Mostrando{' '}
@@ -291,7 +301,7 @@ export function TransactionsTable({
               </Button>
             </div>
           </form>
-        </CardFooter>
+        </CardFooter> */}
         {/* )} */}
       </Card>
     </>

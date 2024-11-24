@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { File, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TransactionsTable } from './transactions-table';
+import { TransactionsKanban } from './transactions-kanban';
 import { getTransactions, ISelectTransaction } from '@/lib/db'; 
 import { useRef } from 'react';
 
@@ -32,7 +33,7 @@ export default async function ProductsPage({
   ]
 
   return (
-    <Tabs defaultValue="1">
+    <Tabs defaultValue="1" className='overflow-y-hidden'>
       <div className="flex items-center">
         <TabsList>
           {tabList.map((tab) => (
@@ -44,7 +45,7 @@ export default async function ProductsPage({
       </div>
       {tabList.map((tab) => (
         <TabsContent key={tab.value} value={tab.value}>
-          <TransactionsTable
+          <TransactionsKanban
             params={{ year: '2024', month: tab.value }}
           />
         </TabsContent>  
